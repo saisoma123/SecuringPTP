@@ -45,7 +45,7 @@ In this work, we aim to apply the foundations and mechanisms of TimeGuard to sec
 
 # System Blocks
 
-![My Diagram](SecuringPTP/images/System Blocks.jpg)
+![My Diagram](SecuringPTP/images/SystemBlocks.jpg)
 
 # HW/SW requirements
 Windows PC, BeagleBone Black, NXP i.MX6Q SabreSD development board (ARM Cortex-A9 cores), ARM TrustZone hardware + OP-TEE OS (secure enclave on SabreSD board)
