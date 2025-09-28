@@ -46,6 +46,9 @@ In this work, we aim to apply the foundations and mechanisms of TimeGuard to sec
 # System Blocks
 
 ![My Diagram](images/SystemBlocks.jpg)
+Note that the PTP server and TimeGuard client are in the user space. The time source access, and TimeGuard handler/watchdog are in the kernel. Lastly, the secure time source is on the system on chip.
+
+Note: Typical terminology lists the PTP client/server as slave/master.
 
 # HW/SW requirements
 Windows PC, BeagleBone Black, NXP i.MX6Q SabreSD development board (ARM Cortex-A9 cores), ARM TrustZone hardware + OP-TEE OS (secure enclave on SabreSD board)
