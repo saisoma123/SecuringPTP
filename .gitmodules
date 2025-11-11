@@ -1,0 +1,3 @@
+[submodule "linuxptp"]
+	path = linuxptp
+	url = https://github.com/saisoma123/linuxptp.git
