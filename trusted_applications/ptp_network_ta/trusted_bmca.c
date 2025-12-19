@@ -1,0 +1,868 @@
+
+#include <tee_internal_api.h>
+#include <tee_internal_api_extensions.h>
+
+#include "bmca_ta.h"
+#include <trace.h>
+#include "fsm.h"
+
+TEE_Result cmd_import_key(uint32_t pt, TEE_Param p[4]);
+TEE_Result cmd_mac_compute(uint32_t pt, TEE_Param p[4]);
+TEE_Result cmd_mac_verify(uint32_t pt, TEE_Param p[4]);
+TEE_Result cmd_delete_key(uint32_t pt, TEE_Param p[4]);
+
+typedef enum {
+	MAC_INVALID = 0,
+	HMAC_SHA256_128,
+	HMAC_SHA256,
+	CMAC_AES128,
+	CMAC_AES256,
+} integrity_alg_type;
+
+
+struct integrity_alg_info {
+	const char         *label;
+	integrity_alg_type type; /* algorithm type - minimum HMAC-SHA256-128 */
+	size_t             key_len;    /* length of key */
+	size_t             digest_len; /* length of icv */
+};
+
+
+
+#define MAX_KEYS 16
+
+
+#define PS_LISTENING 4
+#define PS_MASTER 6
+#define PS_PASSIVE 7
+#define PS_SLAVE 9
+#define PS_GRAND_MASTER 10 
+
+#define BMCA_NOOP 1 
+
+#define A_BETTER_TOPO 2
+#define A_BETTER 1
+#define B_BETTER -1
+#define B_BETTER_TOPO -2
+
+static struct
+{
+	uint8_t priority1;
+	uint8_t priority2;
+	struct BmcaClockQuality quality;
+	uint8_t identity[8];
+} g_secure_defaultds;
+
+struct key_entry {
+    uint32_t handle;
+    TEE_OperationHandle op;
+};
+
+static struct key_entry keys[MAX_KEYS];
+
+
+static struct key_entry *find_key(uint32_t h)
+{
+    for (int i = 0; i < MAX_KEYS; i++)
+        if (keys[i].handle == h)
+            return &keys[i];
+    return NULL;
+}
+
+TEE_Result cmd_import_key(uint32_t pt __unused, TEE_Param p[4])
+{
+    uint32_t alg = p[0].value.a;
+    void *key = p[1].memref.buffer;
+    size_t key_len = p[1].memref.size;
+
+    uint32_t key_handle = 0;
+    TEE_OperationHandle op = TEE_HANDLE_NULL;
+    TEE_ObjectHandle key_obj = TEE_HANDLE_NULL;
+    uint32_t tee_alg, max_key_bits, key_type;
+
+    TEE_Result r;
+    int i;
+
+    if (!key || key_len == 0)
+        return TEE_ERROR_BAD_PARAMETERS;
+
+    switch (alg) {
+    case HMAC_SHA256:
+    case HMAC_SHA256_128:
+			tee_alg      = TEE_ALG_HMAC_SHA256;
+			key_type     = TEE_TYPE_GENERIC_SECRET;   
+			max_key_bits = key_len * 8;
+			break;
+
+    case CMAC_AES128:
+        tee_alg      = TEE_ALG_AES_CMAC;
+        key_type     = TEE_TYPE_AES;
+        max_key_bits = 128;
+        break;
+
+    case CMAC_AES256:
+        tee_alg      = TEE_ALG_AES_CMAC;
+        key_type     = TEE_TYPE_AES;
+        max_key_bits = 256;
+        break;
+
+    default:
+        return TEE_ERROR_BAD_PARAMETERS;
+    }
+
+    r = TEE_AllocateTransientObject(key_type, max_key_bits, &key_obj);
+    if (r != TEE_SUCCESS)
+        goto err;
+
+    TEE_Attribute attr;
+    TEE_InitRefAttribute(&attr, TEE_ATTR_SECRET_VALUE, key, key_len);
+
+    r = TEE_PopulateTransientObject(key_obj, &attr, 1);
+    if (r != TEE_SUCCESS)
+        goto err;
+
+    r = TEE_AllocateOperation(&op, tee_alg, TEE_MODE_MAC, max_key_bits);
+    if (r != TEE_SUCCESS)
+        goto err;
+
+    r = TEE_SetOperationKey(op, key_obj);
+    if (r != TEE_SUCCESS)
+        goto err;
+
+    TEE_FreeTransientObject(key_obj);
+    key_obj = TEE_HANDLE_NULL;
+
+    for (i = 0; i < MAX_KEYS; i++) {
+        if (keys[i].handle == 0) {
+            key_handle = i + 1;
+            keys[i].handle = key_handle;
+            keys[i].op = op;
+            p[2].value.a = key_handle;
+            return TEE_SUCCESS;
+        }
+    }
+
+    r = TEE_ERROR_OUT_OF_MEMORY;
+
+err:
+    if (op != TEE_HANDLE_NULL)
+        TEE_FreeOperation(op);
+    if (key_obj != TEE_HANDLE_NULL)
+        TEE_FreeTransientObject(key_obj);
+    return r;
+}
+
+TEE_Result cmd_mac_compute(uint32_t pt, TEE_Param p[4])
+{
+    uint32_t h = p[0].value.a;
+    struct key_entry *k = find_key(h);
+    if (!k)
+        return TEE_ERROR_ITEM_NOT_FOUND;
+
+    void *buf = p[1].memref.buffer;
+    size_t len = p[1].memref.size;
+    void *tag = p[2].memref.buffer;
+    size_t tag_len = p[2].memref.size;
+
+    TEE_MACInit(k->op, NULL, 0);
+    TEE_MACUpdate(k->op, buf, len);
+    TEE_MACComputeFinal(k->op, NULL, 0, tag, &tag_len);
+
+    p[2].memref.size = tag_len;
+    return TEE_SUCCESS;
+}
+
+TEE_Result cmd_mac_verify(uint32_t pt, TEE_Param p[4])
+{
+    uint32_t h = p[0].value.a;
+    struct key_entry *k = find_key(h);
+    if (!k)
+        return TEE_ERROR_ITEM_NOT_FOUND;
+
+    void *buf = p[1].memref.buffer;
+    size_t len = p[1].memref.size;
+    void *tag = p[2].memref.buffer;
+    size_t tag_len = p[2].memref.size;
+
+    TEE_MACInit(k->op, NULL, 0);
+    TEE_MACUpdate(k->op, buf, len);
+    return TEE_MACCompareFinal(k->op, NULL, 0, tag, tag_len);
+}
+
+TEE_Result cmd_delete_key(uint32_t pt, TEE_Param p[4])
+{
+    uint32_t h = p[0].value.a;
+    struct key_entry *k = find_key(h);
+    if (!k)
+        return TEE_ERROR_ITEM_NOT_FOUND;
+
+    TEE_FreeOperation(k->op);
+    k->handle = 0;
+    k->op = NULL;
+
+    return TEE_SUCCESS;
+}
+
+static void make_clock_ds(struct BmcaDataset *out)
+{
+	TEE_MemFill(out, 0, sizeof(*out));
+	TEE_MemMove(out->identity, g_secure_defaultds.identity, sizeof(out->identity));
+	out->priority1 = g_secure_defaultds.priority1;
+	out->priority2 = g_secure_defaultds.priority2;
+	out->quality = g_secure_defaultds.quality;
+
+	/* BMCA invariants for default DS */
+	out->stepsRemoved = 0;
+	TEE_MemMove(out->sender.clockIdentity, g_secure_defaultds.identity, 8);
+	out->sender.portNumber = 0;
+	TEE_MemMove(out->receiver.clockIdentity, g_secure_defaultds.identity, 8);
+	out->receiver.portNumber = 0;
+	IMSG("BMCA TA DS method finished");
+}
+
+
+
+static int portid_cmp(const struct BmcaPortIdentity *a,
+											const struct BmcaPortIdentity *b)
+{
+	int diff = TEE_MemCompare(a->clockIdentity, b->clockIdentity, 8);
+	if (diff == 0)
+	{
+		int pa = (int)a->portNumber;
+		int pb = (int)b->portNumber;
+		diff = (pa - pb);
+	}
+	return diff;
+}
+
+static int dscmp2(const struct BmcaDataset *a,
+									const struct BmcaDataset *b)
+{
+	int diff;
+	unsigned int A = a ? a->stepsRemoved : 0U;
+	unsigned int B = b ? b->stepsRemoved : 0U;
+
+	if (A + 1 < B)
+		return A_BETTER;
+	if (B + 1 < A)
+		return B_BETTER;
+
+	if (A < B)
+	{
+		diff = portid_cmp(&b->receiver, &b->sender);
+		if (diff < 0)
+			return A_BETTER;
+		if (diff > 0)
+			return A_BETTER_TOPO;
+		return 0; /* error-1 */
+	}
+	if (A > B)
+	{
+		diff = portid_cmp(&a->receiver, &a->sender);
+		if (diff < 0)
+			return B_BETTER;
+		if (diff > 0)
+			return B_BETTER_TOPO;
+		return 0; /* error-1 */
+	}
+
+	diff = portid_cmp(&a->sender, &b->sender);
+	if (diff < 0)
+		return A_BETTER_TOPO;
+	if (diff > 0)
+		return B_BETTER_TOPO;
+
+	if (a->receiver.portNumber < b->receiver.portNumber)
+		return A_BETTER_TOPO;
+	if (a->receiver.portNumber > b->receiver.portNumber)
+		return B_BETTER_TOPO;
+
+	/* error-2 */
+	return 0;
+}
+
+static int dscmp(const struct BmcaDataset *a,
+								 const struct BmcaDataset *b)
+{
+	int diff;
+
+	if (a == b)
+		return 0;
+	if (a && !b)
+		return A_BETTER;
+	if (b && !a)
+		return B_BETTER;
+
+	diff = TEE_MemCompare(a->identity, b->identity, sizeof(a->identity));
+	if (!diff)
+		return dscmp2(a, b);
+
+	if (a->priority1 < b->priority1)
+		return A_BETTER;
+	if (a->priority1 > b->priority1)
+		return B_BETTER;
+
+	if (a->quality.clockClass < b->quality.clockClass)
+		return A_BETTER;
+	if (a->quality.clockClass > b->quality.clockClass)
+		return B_BETTER;
+
+	if (a->quality.clockAccuracy < b->quality.clockAccuracy)
+		return A_BETTER;
+	if (a->quality.clockAccuracy > b->quality.clockAccuracy)
+		return B_BETTER;
+
+	if (a->quality.offsetScaledLogVariance <
+			b->quality.offsetScaledLogVariance)
+		return A_BETTER;
+	if (a->quality.offsetScaledLogVariance >
+			b->quality.offsetScaledLogVariance)
+		return B_BETTER;
+
+	if (a->priority2 < b->priority2)
+		return A_BETTER;
+	if (a->priority2 > b->priority2)
+		return B_BETTER;
+
+	return diff < 0 ? A_BETTER : B_BETTER;
+}
+
+
+static uint8_t bmca_decide(const struct BmcaInput *in)
+{
+	struct BmcaDataset clock_ds;
+	const struct BmcaDataset *clock_best = in->has_clock_best ? &in->clock_best : NULL;
+	const struct BmcaDataset *port_best = in->has_port_best ? &in->port_best : NULL;
+	uint8_t ps = in->current_port_state;
+
+	make_clock_ds(&clock_ds);
+	IMSG("BMCA TA DS worked");
+
+	if (!port_best && in->bmca_mode == BMCA_NOOP)
+		return ps;
+
+	if (!port_best && ps == PS_LISTENING)
+		return ps;
+
+	if (in->clock_class <= 127)
+	{
+		if (dscmp(&clock_ds, port_best) > 0)
+			return PS_GRAND_MASTER; /* M1 */
+		else
+			return PS_PASSIVE; /* P1 */
+	}
+
+	if (dscmp(&clock_ds, clock_best) > 0)
+		return PS_GRAND_MASTER; /* M2 */
+
+	if (in->clock_best_is_this_port)
+		return PS_SLAVE; /* S1 */
+
+	if (dscmp(clock_best, port_best) == A_BETTER_TOPO)
+		return PS_PASSIVE; /* P2 */
+	else
+		return PS_MASTER; /* M3 */
+}
+
+
+static uint8_t ta_run_ptp_fsm(const struct BmcaFsmInput *in)
+{
+    enum port_state state = (enum port_state)in->state;
+    enum fsm_event  event    = (enum fsm_event)in->event;
+    int             mdiff = (int)in->mdiff;
+
+    enum port_state next = state;
+		if (EV_INITIALIZE == event || EV_POWERUP == event)
+		return PS_INITIALIZING;
+
+	switch (state) {
+	case PS_INITIALIZING:
+		switch (event) {
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_INIT_COMPLETE:
+			next = PS_LISTENING;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_FAULTY:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_CLEARED:
+			next = PS_INITIALIZING;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_DISABLED:
+		if (EV_DESIGNATED_ENABLED == event)
+			next = PS_INITIALIZING;
+		break;
+
+	case PS_LISTENING:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+			next = PS_MASTER;
+			break;
+		case EV_RS_MASTER:
+			next = PS_PRE_MASTER;
+			break;
+		case EV_RS_GRAND_MASTER:
+			next = PS_GRAND_MASTER;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_PASSIVE:
+			next = PS_PASSIVE;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_PRE_MASTER:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_QUALIFICATION_TIMEOUT_EXPIRES:
+			next = PS_MASTER;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_PASSIVE:
+			next = PS_PASSIVE;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_MASTER:
+	case PS_GRAND_MASTER:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_PASSIVE:
+			next = PS_PASSIVE;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_PASSIVE:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+			next = PS_MASTER;
+			break;
+		case EV_RS_MASTER:
+			next = PS_PRE_MASTER;
+			break;
+		case EV_RS_GRAND_MASTER:
+			next = PS_GRAND_MASTER;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_UNCALIBRATED:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+			next = PS_MASTER;
+			break;
+		case EV_MASTER_CLOCK_SELECTED:
+			next = PS_SLAVE;
+			break;
+		case EV_RS_MASTER:
+			next = PS_PRE_MASTER;
+			break;
+		case EV_RS_GRAND_MASTER:
+			next = PS_GRAND_MASTER;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_PASSIVE:
+			next = PS_PASSIVE;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_SLAVE:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+			next = PS_MASTER;
+			break;
+		case EV_SYNCHRONIZATION_FAULT:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_MASTER:
+			next = PS_PRE_MASTER;
+			break;
+		case EV_RS_GRAND_MASTER:
+			next = PS_GRAND_MASTER;
+			break;
+		case EV_RS_SLAVE:
+			if (mdiff)
+				next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_PASSIVE:
+			next = PS_PASSIVE;
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+
+    return (uint8_t)next;
+}
+
+static uint8_t ta_run_ptp_slave_fsm(const struct BmcaFsmInput *in)
+{
+    enum port_state state = (enum port_state)in->state;
+    enum fsm_event  event    = (enum fsm_event)in->event;
+    int             mdiff = (int)in->mdiff;
+
+    enum port_state next = state;
+		if (EV_INITIALIZE == event || EV_POWERUP == event)
+		return PS_INITIALIZING;
+
+	switch (state) {
+	case PS_INITIALIZING:
+		switch (event) {
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_INIT_COMPLETE:
+			next = PS_LISTENING;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_FAULTY:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_CLEARED:
+			next = PS_INITIALIZING;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_DISABLED:
+		if (EV_DESIGNATED_ENABLED == event)
+			next = PS_INITIALIZING;
+		break;
+
+	case PS_LISTENING:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+		case EV_RS_MASTER:
+		case EV_RS_GRAND_MASTER:
+		case EV_RS_PASSIVE:
+			next = PS_LISTENING;
+			break;
+		case EV_RS_SLAVE:
+			next = PS_UNCALIBRATED;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_UNCALIBRATED:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+		case EV_RS_MASTER:
+		case EV_RS_GRAND_MASTER:
+		case EV_RS_PASSIVE:
+			next = PS_LISTENING;
+			break;
+		case EV_MASTER_CLOCK_SELECTED:
+			next = PS_SLAVE;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case PS_SLAVE:
+		switch (event) {
+		case EV_DESIGNATED_DISABLED:
+			next = PS_DISABLED;
+			break;
+		case EV_FAULT_DETECTED:
+			next = PS_FAULTY;
+			break;
+		case EV_ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES:
+		case EV_RS_MASTER:
+		case EV_RS_GRAND_MASTER:
+		case EV_RS_PASSIVE:
+			next = PS_LISTENING;
+			break;
+		case EV_SYNCHRONIZATION_FAULT:
+			next = PS_UNCALIBRATED;
+			break;
+		case EV_RS_SLAVE:
+			if (mdiff)
+				next = PS_UNCALIBRATED;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+    return (uint8_t)next;
+}
+
+
+
+/* =========================
+ * TA Entry Points
+ * ========================= */
+
+TEE_Result TA_CreateEntryPoint(void)
+{
+	return TEE_SUCCESS;
+}
+
+void TA_DestroyEntryPoint(void)
+{
+}
+
+TEE_Result TA_OpenSessionEntryPoint(uint32_t param_types,
+																		TEE_Param __unused params[4],
+																		void **sess_ctx __unused)
+{
+	uint32_t exp_param_types = TEE_PARAM_TYPES(TEE_PARAM_TYPE_NONE,
+																						 TEE_PARAM_TYPE_NONE,
+																						 TEE_PARAM_TYPE_NONE,
+																						 TEE_PARAM_TYPE_NONE);
+
+	if (param_types != exp_param_types)
+		return TEE_ERROR_BAD_PARAMETERS;
+
+	/* No per-session state required for BMCA */
+	return TEE_SUCCESS;
+}
+
+void TA_CloseSessionEntryPoint(void *sess_ctx __unused)
+{
+	/* Nothing to free — stateless TA session */
+}
+
+/* Command dispatcher */
+TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx __unused,
+																			uint32_t cmd_id,
+																			uint32_t param_types,
+																			TEE_Param params[4])
+{
+	switch (cmd_id)
+	{
+	case TA_BMCA_CMD_DECIDE:
+	{
+		uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+																	 TEE_PARAM_TYPE_MEMREF_OUTPUT,
+																	 TEE_PARAM_TYPE_NONE,
+																	 TEE_PARAM_TYPE_NONE);
+		if (param_types != exp)
+			return TEE_ERROR_BAD_PARAMETERS;
+
+		if (!params[0].memref.buffer || !params[1].memref.buffer)
+			return TEE_ERROR_BAD_PARAMETERS;
+
+		if (params[0].memref.size < sizeof(struct BmcaInput) ||
+				params[1].memref.size < sizeof(struct BmcaOutput))
+			return TEE_ERROR_SHORT_BUFFER;
+
+		const struct BmcaInput *in = (const struct BmcaInput *)params[0].memref.buffer;
+		struct BmcaOutput *out = (struct BmcaOutput *)params[1].memref.buffer;
+
+		/* Optional hardening */
+		TEE_MemFill(out, 0, params[1].memref.size);
+
+		out->decided_state = bmca_decide(in);
+
+		/* Tell host how many bytes we wrote */
+		params[1].memref.size = sizeof(struct BmcaOutput);
+		IMSG("BMCA TA decide ran");
+		return TEE_SUCCESS;
+	}
+	case TA_BMCA_CMD_SET_DEFAULT_DS:
+	{
+		uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+																	 TEE_PARAM_TYPE_NONE,
+																	 TEE_PARAM_TYPE_NONE,
+																	 TEE_PARAM_TYPE_NONE);
+		if (param_types != exp)
+			return TEE_ERROR_BAD_PARAMETERS;
+
+		if (!params[0].memref.buffer ||
+				params[0].memref.size < sizeof(struct BmcaDefaultDS))
+			return TEE_ERROR_SHORT_BUFFER;
+
+		const struct BmcaDefaultDS *d =
+				(const struct BmcaDefaultDS *)params[0].memref.buffer;
+
+		/* Commit to secure defaults */
+		g_secure_defaultds.priority1 = d->priority1;
+		g_secure_defaultds.priority2 = d->priority2;
+		g_secure_defaultds.quality = d->quality;
+		TEE_MemMove(g_secure_defaultds.identity, d->identity, sizeof(d->identity));
+		IMSG("BMCA default ran");
+		return TEE_SUCCESS;
+	}
+	case TA_BMCA_CMD_PTP_FSM:
+    {
+        uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+                                       TEE_PARAM_TYPE_MEMREF_OUTPUT,
+                                       TEE_PARAM_TYPE_NONE,
+                                       TEE_PARAM_TYPE_NONE);
+        if (param_types != exp)
+            return TEE_ERROR_BAD_PARAMETERS;
+
+        if (!params[0].memref.buffer || !params[1].memref.buffer)
+            return TEE_ERROR_BAD_PARAMETERS;
+
+        if (params[0].memref.size < sizeof(struct BmcaFsmInput) ||
+            params[1].memref.size < sizeof(struct BmcaFsmOutput))
+            return TEE_ERROR_SHORT_BUFFER;
+
+        const struct BmcaFsmInput *in =
+            (const struct BmcaFsmInput *)params[0].memref.buffer;
+        struct BmcaFsmOutput *out =
+            (struct BmcaFsmOutput *)params[1].memref.buffer;
+
+        TEE_MemFill(out, 0, params[1].memref.size);
+
+        out->next_state = ta_run_ptp_fsm(in);
+        params[1].memref.size = sizeof(struct BmcaFsmOutput);
+
+        IMSG("BMCA TA PTP_FSM ran (state=%u ev=%u mdiff=%d -> next=%u)",
+             in->state, in->event, in->mdiff, out->next_state);
+
+        return TEE_SUCCESS;
+    }
+
+    case TA_BMCA_CMD_PTP_SLAVE_FSM:
+    {
+        uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+                                       TEE_PARAM_TYPE_MEMREF_OUTPUT,
+                                       TEE_PARAM_TYPE_NONE,
+                                       TEE_PARAM_TYPE_NONE);
+        if (param_types != exp)
+            return TEE_ERROR_BAD_PARAMETERS;
+
+        if (!params[0].memref.buffer || !params[1].memref.buffer)
+            return TEE_ERROR_BAD_PARAMETERS;
+
+        if (params[0].memref.size < sizeof(struct BmcaFsmInput) ||
+            params[1].memref.size < sizeof(struct BmcaFsmOutput))
+            return TEE_ERROR_SHORT_BUFFER;
+
+        const struct BmcaFsmInput *in =
+            (const struct BmcaFsmInput *)params[0].memref.buffer;
+        struct BmcaFsmOutput *out =
+            (struct BmcaFsmOutput *)params[1].memref.buffer;
+
+        TEE_MemFill(out, 0, params[1].memref.size);
+
+        out->next_state = ta_run_ptp_slave_fsm(in);
+        params[1].memref.size = sizeof(struct BmcaFsmOutput);
+
+        IMSG("BMCA TA PTP_SLAVE_FSM ran (state=%u ev=%u mdiff=%d -> next=%u)",
+             in->state, in->event, in->mdiff, out->next_state);
+
+        return TEE_SUCCESS;
+    }
+
+	case CMD_IMPORT_KEY:
+        return cmd_import_key(param_types, params);
+
+    case CMD_MAC_COMPUTE:
+        return cmd_mac_compute(param_types, params);
+
+    case CMD_MAC_VERIFY:
+        return cmd_mac_verify(param_types, params);
+
+    case CMD_DELETE_KEY:
+        return cmd_delete_key(param_types, params);
+
+
+	default:
+		return TEE_ERROR_NOT_SUPPORTED;
+	}
+}
