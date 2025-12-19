@@ -69,6 +69,8 @@ static struct key_entry *find_key(uint32_t h)
     return NULL;
 }
 
+
+// Creates key in memory from shared key the client and server share
 TEE_Result cmd_import_key(uint32_t pt __unused, TEE_Param p[4])
 {
     uint32_t alg = p[0].value.a;
@@ -152,6 +154,7 @@ err:
     return r;
 }
 
+// Computes the MAC value using TEE API
 TEE_Result cmd_mac_compute(uint32_t pt, TEE_Param p[4])
 {
     uint32_t h = p[0].value.a;
@@ -172,6 +175,7 @@ TEE_Result cmd_mac_compute(uint32_t pt, TEE_Param p[4])
     return TEE_SUCCESS;
 }
 
+// Verifies if the MAC it received was correct by recomputing based on key
 TEE_Result cmd_mac_verify(uint32_t pt, TEE_Param p[4])
 {
     uint32_t h = p[0].value.a;
@@ -189,6 +193,7 @@ TEE_Result cmd_mac_verify(uint32_t pt, TEE_Param p[4])
     return TEE_MACCompareFinal(k->op, NULL, 0, tag, tag_len);
 }
 
+// Deletes key entry
 TEE_Result cmd_delete_key(uint32_t pt, TEE_Param p[4])
 {
     uint32_t h = p[0].value.a;
@@ -203,6 +208,7 @@ TEE_Result cmd_delete_key(uint32_t pt, TEE_Param p[4])
     return TEE_SUCCESS;
 }
 
+// Makes clock data structure for BMCA
 static void make_clock_ds(struct BmcaDataset *out)
 {
 	TEE_MemFill(out, 0, sizeof(*out));
@@ -221,7 +227,7 @@ static void make_clock_ds(struct BmcaDataset *out)
 }
 
 
-
+// Reimplementation from PTP4L
 static int portid_cmp(const struct BmcaPortIdentity *a,
 											const struct BmcaPortIdentity *b)
 {
@@ -235,6 +241,7 @@ static int portid_cmp(const struct BmcaPortIdentity *a,
 	return diff;
 }
 
+// Reimplementation from PTP4L
 static int dscmp2(const struct BmcaDataset *a,
 									const struct BmcaDataset *b)
 {
@@ -281,6 +288,7 @@ static int dscmp2(const struct BmcaDataset *a,
 	return 0;
 }
 
+// Reimplementation from PTP4L
 static int dscmp(const struct BmcaDataset *a,
 								 const struct BmcaDataset *b)
 {
@@ -327,7 +335,7 @@ static int dscmp(const struct BmcaDataset *a,
 	return diff < 0 ? A_BETTER : B_BETTER;
 }
 
-
+// BMCA decision machine
 static uint8_t bmca_decide(const struct BmcaInput *in)
 {
 	struct BmcaDataset clock_ds;
@@ -364,7 +372,7 @@ static uint8_t bmca_decide(const struct BmcaInput *in)
 		return PS_MASTER; /* M3 */
 }
 
-
+// Runs the PTP FSM for determing port state based on BMCA
 static uint8_t ta_run_ptp_fsm(const struct BmcaFsmInput *in)
 {
     enum port_state state = (enum port_state)in->state;
@@ -569,6 +577,7 @@ static uint8_t ta_run_ptp_fsm(const struct BmcaFsmInput *in)
     return (uint8_t)next;
 }
 
+// Runs the PTP FSM for determing port state based on BMCA
 static uint8_t ta_run_ptp_slave_fsm(const struct BmcaFsmInput *in)
 {
     enum port_state state = (enum port_state)in->state;
@@ -689,11 +698,9 @@ static uint8_t ta_run_ptp_slave_fsm(const struct BmcaFsmInput *in)
 }
 
 
-
-/* =========================
- * TA Entry Points
- * ========================= */
-
+/*
+Boilerplate TA code needed for client side interaction
+*/
 TEE_Result TA_CreateEntryPoint(void)
 {
 	return TEE_SUCCESS;
