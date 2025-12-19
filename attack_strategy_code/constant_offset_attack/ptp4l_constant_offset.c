@@ -48,6 +48,9 @@
 #define FD_TO_CLOCKID(fd) ((~(clockid_t) (fd) << 3) | CLOCKFD)
 
 int sync_sock = -1;
+/*
+This method opens a UDP socket and receives PTP event messages
+*/
 static int open_sync_socket(const char *iface)
 {
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -68,7 +71,6 @@ static int open_sync_socket(const char *iface)
         return -1;
     }
 
-    /* join default PTP multicast group (harmless if unicast profile) */
     struct ip_mreqn mreq;
     memset(&mreq, 0, sizeof(mreq));
     mreq.imr_multiaddr.s_addr = inet_addr("224.0.1.129");
@@ -307,6 +309,7 @@ int main(int argc, char *argv[])
 	}
 
 	err = 0;
+	// In this section, we create a timex struct that contains a 2 ms offset
         int fd = open("/dev/ptp0", O_RDWR);
         if (fd < 0) {
                 pr_notice("open /dev/ptp0");
@@ -334,7 +337,7 @@ int main(int argc, char *argv[])
 	static int have_sync = 0;
 	static struct timespec last_adj = {0};	        
 	while (is_running()) {
-
+            // This block checks for the first Sync message, and injects the timex struct from before
     		if (!have_sync && sync_sock >= 0) {
         		unsigned char buf[256];
         		ssize_t n = recv(sync_sock, buf, sizeof(buf), 0);  
@@ -353,7 +356,7 @@ int main(int argc, char *argv[])
             		}	
         		}
     		}
-
+            // If we have received the first sync already, keep applying the offset injection
     		if (have_sync) {
         		struct timespec now;
         		clock_gettime(CLOCK_MONOTONIC, &now);

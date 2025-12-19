@@ -47,6 +47,7 @@
 
 static const int64_t ERROR = 483302;
 
+// Registers with the TimeGuard trusted application
 static void timeguard_init(void)
 {
 	uint8_t dev_secret[32] = {0}; 
@@ -58,6 +59,7 @@ static void timeguard_init(void)
 	}
 }
 
+// Counts the number of digits in a number
 int count_digits_int64(int64_t x)
 {
     if (x < 0)
@@ -80,6 +82,7 @@ uint64_t scale_from_digits(int digits)
     return scale;
 }
 
+// Gets the PHC time in int64_t
 static int64_t phc_get_time_ns(const char *ptp_path)
 {
     int fd = open(ptp_path, O_RDONLY);
@@ -97,7 +100,7 @@ static int64_t phc_get_time_ns(const char *ptp_path)
     return (int64_t)ts.tv_sec * 1000000000LL + (int64_t)ts.tv_nsec;
 }
 
-
+// Adjusts the PHC time based on error
 static void phc_adjust(const char *ptp_path, struct timex *time)
 {
     int fd = open(ptp_path, O_RDWR);
@@ -111,7 +114,7 @@ static void phc_adjust(const char *ptp_path, struct timex *time)
 
 }
 
-
+// Implements Policy C based on TimeGuard paper and scales the error based on master offset and applies correction
 static void timeguard_policy_c_step(struct clock *c)
 {
      int m = 1;
@@ -200,6 +203,7 @@ static void timeguard_policy_c_step(struct clock *c)
     next_inspect_time = now_ns + r2 * slot;
 }
 
+// Implements Policy A based on TimeGuard paper and scales the error based on master offset and applies correction
 static void timeguard_policy_a_step(struct clock *c)
 {
     int64_t tS = 1000000000LL; 
@@ -283,6 +287,7 @@ static void timeguard_policy_a_step(struct clock *c)
     next_inspect_time += p;
 }
 
+// Implements Policy B based on TimeGuard paper and scales the error based on master offset and applies correction
 static void timeguard_policy_b_step(struct clock *c)
 {
     int64_t tS   = 1000000000LL; 
@@ -609,7 +614,7 @@ int main(int argc, char *argv[])
 	timeguard_init();
 	err = 0;
 	while (is_running()) {
-             timeguard_policy_c_step(clock);
+            // timeguard_policy_c_step(clock); all of the policies are called here
                 if (clock_poll(clock))
 			break;	
                

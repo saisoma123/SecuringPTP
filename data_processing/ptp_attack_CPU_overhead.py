@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Measured CPU averaged baseline
 BASELINE_AVG = {
     "0": 31.22,
     "1": 33.12,
@@ -17,7 +18,7 @@ def load_json(path):
     with open(path, "r") as f:
         return json.load(f)
 
-
+# This averages the jitterdebugger data across 3 runs 
 def average_cpu_avgs(json_paths):
     sums = {}    
     counts = {} 
@@ -44,7 +45,7 @@ def average_cpu_avgs(json_paths):
 
     return averages
 
-
+# This averages the PTP baseline and the watchdog policies and measures the inferred CPU overhead
 def main():
     if len(sys.argv) != 1 + 12:
         print(

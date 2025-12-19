@@ -44,8 +44,8 @@
 #define CLOCKFD        3
 
 static const int32_t RANDOM_PPB = 200;
-static int CALLS = 0;
-
+static int CALLS = 0; // Keeps track of the number of calls in the PTP daemon loop
+// Samples a random ppb value from 0 to 200
 static inline int32_t sample_uniform_ppb_bound(void)
 {
     if (RANDOM_PPB <= 0) return 0;
@@ -271,7 +271,8 @@ int main(int argc, char *argv[])
 	}
 
 	err = 0;
-        int fd = open("/dev/ptp0", O_RDWR);
+        // This prepares a timex struct with a random ppb value for frequency injection
+	    int fd = open("/dev/ptp0", O_RDWR);
         if (fd < 0) {
                 perror("open /dev/ptp0");
                 return -1;
@@ -289,7 +290,7 @@ int main(int argc, char *argv[])
 
     		if (now.tv_sec != last_adj.tv_sec) {
         		last_adj = now;
-	
+	        // For every 5 calls, inject the random bias value 
 			if (CALLS % 5 == 0) {
                 		bias_ppb = sample_uniform_ppb_bound();
         			freq = (double)bias_ppb;

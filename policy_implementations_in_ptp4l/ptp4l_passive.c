@@ -66,6 +66,8 @@ uint64_t scale_from_digits(int digits)
     return scale;
 }
 
+ // Registers with the TimeGuard trusted application
+
 static void timeguard_init(void)
 {
         uint8_t dev_secret[32] = {0};
@@ -77,6 +79,7 @@ static void timeguard_init(void)
         }
 }
 
+// Retrieves the PHC time in int64_t
 static int64_t phc_get_time_ns(const char *ptp_path)
 {
     int fd = open(ptp_path, O_RDONLY);
@@ -97,7 +100,7 @@ static int64_t phc_get_time_ns(const char *ptp_path)
 
 
 
-
+// Corrects the PHC time based on the timex struct
 static void phc_adjust(const char *ptp_path, struct timex *time)
 {
     int fd = open(ptp_path, O_RDWR);
@@ -112,7 +115,9 @@ static void phc_adjust(const char *ptp_path, struct timex *time)
 
 }
 
-
+// Retrieves the current cpu core and forwards to our trusted app that executes MRU prediction
+// that checks if its prediction was correct
+// and applies latency based on that
 static void timeguard_mru_passive_step(struct clock *c)
 {
     int64_t phc_ns = phc_get_time_ns("/dev/ptp0");
@@ -177,8 +182,9 @@ static void timeguard_mru_passive_step(struct clock *c)
     phc_adjust("/dev/ptp0", &tx_step);
 }
 
-/* --------- RANDOM policy --------- */
-
+// Retrieves the current cpu core and forwards to our trusted app that executes random prediction
+// that checks if its prediction was correct
+// and applies latency based on that
 static void timeguard_random_passive_step(struct clock *c)
 {
     int64_t phc_ns = phc_get_time_ns("/dev/ptp0");

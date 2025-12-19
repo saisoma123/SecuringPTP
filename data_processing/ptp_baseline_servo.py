@@ -7,12 +7,8 @@ MAX_OFFSETS = 300
 
 OFFSET_REGEX = re.compile(r"master offset\s+(-?\d+)")
 
-
+# Extracts the offsets from the PTP4L logs in nanoseconds
 def extract_offsets(path, max_count=MAX_OFFSETS):
-    """
-    Extract up to max_count 'master offset' values (as ints) from a ptp4l log file.
-    Returns a list of offsets in nanoseconds.
-    """
     offsets = []
     with open(path, "r") as f:
         for line in f:
@@ -24,7 +20,7 @@ def extract_offsets(path, max_count=MAX_OFFSETS):
                     break
     return offsets
 
-
+# Averages the extracted offsets from 3 runs
 def average_run_offsets(log_paths, max_count=MAX_OFFSETS):
 
     if len(log_paths) != 3:
@@ -44,7 +40,7 @@ def average_run_offsets(log_paths, max_count=MAX_OFFSETS):
         avg_offsets.append(s / 3.0)
     return avg_offsets
 
-
+# Plots our averaged out runs per policy/baseline
 def main():
 
     if len(sys.argv) != 1 + 12:
