@@ -1,0 +1,351 @@
+ptp4l[552226.847]: selected /dev/ptp0 as PTP clock
+ptp4l[552226.855]: port 1 (eth0): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[552226.858]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[552226.861]: port 0 (/var/run/ptp4lro): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[552226.905]: timeguard: registered, proxy_id=0x4987baf61e1fa41f
+
+ptp4l[552226.907]: TG_CMD_SET_TIME InvokeCommand result: 0x0
+
+ptp4l[552233.055]: selected local clock 000000.fffe.049f06 as best master
+ptp4l[552233.056]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552233.058]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552233.059]: TEE: DECIDE OK -> decided_state=4 (ps_out=4)
+
+ptp4l[552234.173]: port 1 (eth0): new foreign master 641c10.fffe.f12579-1
+ptp4l[552238.188]: selected best master clock 641c10.fffe.f12579
+ptp4l[552238.188]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552238.189]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552238.190]: TEE: DECIDE OK -> decided_state=9 (ps_out=9)
+
+ptp4l[552238.191]: port 1 (eth0): LISTENING to UNCALIBRATED on RS_SLAVE
+ptp4l[552240.190]: master offset    9999138 s0 freq  -81033 path delay       937
+ptp4l[552241.192]: master offset   11999118 s1 freq +1914533 path delay       937
+ptp4l[552242.190]: master offset    -964353 s2 freq +950180 path delay       937
+ptp4l[552242.192]: port 1 (eth0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+ptp4l[552243.175]: master offset  -12072365 s2 freq -10447138 path delay   2064030
+ptp4l[552244.164]: master offset   15175793 s2 freq +13179310 path delay       937
+ptp4l[552245.178]: master offset    1292777 s2 freq +3849032 path delay       937
+ptp4l[552246.188]: master offset   15497471 s2 freq +18441559 path delay  -3046172
+ptp4l[552247.194]: master offset    1002819 s2 freq +8596148 path delay  -1368738
+ptp4l[552248.180]: master offset  -19495453 s2 freq -11601278 path delay       937
+ptp4l[552249.161]: master offset  -15240273 s2 freq -13194734 path delay       937
+ptp4l[552250.156]: master offset   11926907 s2 freq +9400364 path delay  -1368738
+ptp4l[552251.187]: master offset   12928906 s2 freq +13980435 path delay       937
+ptp4l[552252.200]: master offset    6353452 s2 freq +11283653 path delay       937
+ptp4l[552253.193]: master offset  -13919645 s2 freq -7083408 path delay    786153
+ptp4l[552254.173]: master offset   -3951383 s2 freq -1291040 path delay   -583522
+ptp4l[552255.170]: master offset   -1310972 s2 freq +163956 path delay   -583522
+ptp4l[552256.178]: master offset   10000108 s2 freq +11081745 path delay  -1858482
+ptp4l[552257.192]: master offset   10643758 s2 freq +14725427 path delay  -1858482
+ptp4l[552258.194]: master offset   -5763933 s2 freq +1510864 path delay   -310531
+ptp4l[552259.178]: master offset  -16782429 s2 freq -11236812 path delay    964429
+ptp4l[552260.163]: master offset  -13595782 s2 freq -13084894 path delay    964429
+ptp4l[552261.166]: master offset   13467430 s2 freq +9899583 path delay   -310531
+ptp4l[552262.192]: master offset   15151920 s2 freq +15624302 path delay   -310531
+ptp4l[552263.204]: master offset    7199657 s2 freq +12217615 path delay   -310531
+ptp4l[552264.195]: master offset  -13412991 s2 freq -6235135 path delay   -310531
+ptp4l[552265.174]: master offset   -7082807 s2 freq -3928849 path delay  -1342893
+ptp4l[552266.169]: master offset   10042419 s2 freq +11071535 path delay  -1342893
+ptp4l[552267.178]: master offset   -1287568 s2 freq +2754274 path delay  -1342893
+ptp4l[552268.187]: master offset   10261083 s2 freq +13916654 path delay  -2250895
+ptp4l[552269.193]: master offset    1620683 s2 freq +8354579 path delay  -2250895
+ptp4l[552270.185]: master offset  -13455215 s2 freq -6235114 path delay  -2250895
+ptp4l[552271.168]: master offset  -11736083 s2 freq -8552546 path delay    261015
+ptp4l[552272.170]: master offset    -908876 s2 freq -1246164 path delay    261015
+ptp4l[552273.181]: master offset   13596388 s2 freq +12986437 path delay   -754854
+ptp4l[552274.200]: master offset   11746199 s2 freq +15215164 path delay   -754854
+ptp4l[552275.201]: master offset   -7543732 s2 freq -550907 path delay    261015
+ptp4l[552276.181]: master offset  -16299562 s2 freq -11569856 path delay   1320364
+ptp4l[552277.166]: master offset  -12038997 s2 freq -12199160 path delay   1380399
+ptp4l[552278.163]: master offset   15499388 s2 freq +11727526 path delay    261015
+ptp4l[552279.184]: master offset    3008617 s2 freq +3886571 path delay    261015
+ptp4l[552280.197]: master offset   15067414 s2 freq +16847953 path delay   -188194
+ptp4l[552281.204]: master offset     165503 s2 freq +6466267 path delay    931189
+ptp4l[552282.193]: master offset  -14616272 s2 freq -8265858 path delay    931189
+ptp4l[552283.174]: master offset   -4730262 s2 freq -2764729 path delay    931189
+ptp4l[552284.177]: master offset    9232818 s2 freq +9779272 path delay   -824856
+ptp4l[552285.190]: master offset    3019756 s2 freq +6336056 path delay  -1384122
+ptp4l[552286.191]: master offset   -5309197 s2 freq -1086971 path delay  -1384122
+ptp4l[552287.181]: master offset   -3441216 s2 freq -811749 path delay  -1384122
+ptp4l[552288.179]: master offset    -134442 s2 freq +1462661 path delay  -1506426
+ptp4l[552289.181]: master offset     511938 s2 freq +2068708 path delay  -1198100
+ptp4l[552290.187]: master offset     473499 s2 freq +2183850 path delay   -978147
+ptp4l[552291.188]: master offset     200203 s2 freq +2052604 path delay   -978147
+ptp4l[552292.187]: master offset    -219893 s2 freq +1692569 path delay   -978147
+ptp4l[552293.187]: master offset    -435577 s2 freq +1410917 path delay   -779952
+ptp4l[552294.185]: master offset    -313080 s2 freq +1402741 path delay   -593499
+ptp4l[552295.185]: master offset    1105092 s2 freq +2726989 path delay   -491748
+ptp4l[552296.186]: master offset     256539 s2 freq +2209964 path delay   -491748
+ptp4l[552297.187]: master offset   -1577063 s2 freq +453323 path delay   -491748
+ptp4l[552298.186]: master offset    -237077 s2 freq +1320190 path delay   -491748
+ptp4l[552299.188]: master offset    2762212 s2 freq +4248356 path delay   -491748
+ptp4l[552300.189]: master offset   -1392988 s2 freq +921820 path delay   -479756
+ptp4l[552301.187]: master offset   -4084393 s2 freq -2187482 path delay   -389329
+ptp4l[552302.182]: master offset   -4618401 s2 freq -3946807 path delay    232515
+ptp4l[552303.185]: master offset    2934063 s2 freq +2220136 path delay    232515
+ptp4l[552304.193]: master offset    8806444 s2 freq +8972736 path delay    232515
+ptp4l[552305.200]: master offset    5840161 s2 freq +8648386 path delay    232515
+ptp4l[552306.198]: master offset   -8026257 s2 freq -3465983 path delay    568436
+ptp4l[552307.186]: master offset   -4398291 s2 freq -2245894 path delay    568436
+ptp4l[552308.182]: master offset   -1238161 s2 freq -405252 path delay    -70683
+ptp4l[552309.186]: master offset   10668308 s2 freq +11129769 path delay  -1450399
+ptp4l[552310.198]: master offset    9348147 s2 freq +13010100 path delay  -1480312
+ptp4l[552311.198]: master offset   -4037200 s2 freq +2429197 path delay  -1480312
+ptp4l[552312.189]: master offset   -6271345 s2 freq -1016108 path delay  -1480312
+ptp4l[552313.177]: master offset  -10919174 s2 freq -7545340 path delay  -1480312
+ptp4l[552314.173]: master offset   -5144172 s2 freq -5046090 path delay   -465087
+ptp4l[552315.180]: master offset    2004205 s2 freq +559035 path delay   -465087
+ptp4l[552316.194]: master offset   14672411 s2 freq +13828503 path delay   -974099
+ptp4l[552317.203]: master offset    3842777 s2 freq +7400592 path delay   -974099
+ptp4l[552318.201]: master offset   -4194005 s2 freq +516643 path delay    -58404
+ptp4l[552319.188]: master offset   -4325463 s2 freq -873016 path delay    -58404
+ptp4l[552320.183]: master offset   -7226815 s2 freq -5072007 path delay    333151
+ptp4l[552321.182]: master offset     615176 s2 freq +601939 path delay    333151
+ptp4l[552322.187]: master offset    2080088 s2 freq +2251404 path delay    333151
+ptp4l[552323.197]: master offset    5746032 s2 freq +6541374 path delay    -58404
+ptp4l[552324.200]: master offset    2516897 s2 freq +5036049 path delay    -96259
+ptp4l[552325.196]: master offset   -6569575 s2 freq -3295354 path delay    -96259
+ptp4l[552326.187]: master offset   -2455683 s2 freq -1152334 path delay    -96259
+ptp4l[552327.188]: master offset    1569260 s2 freq +2135904 path delay    -96259
+ptp4l[552328.194]: master offset    5908048 s2 freq +6945470 path delay    -96259
+ptp4l[552329.200]: master offset    4569325 s2 freq +7379161 path delay   -299913
+ptp4l[552330.199]: master offset   -4799100 s2 freq -618466 path delay   -299913
+ptp4l[552331.189]: master offset   -3333652 s2 freq -592748 path delay   -466758
+ptp4l[552332.188]: master offset   -1132765 s2 freq +608043 path delay   -466758
+ptp4l[552333.189]: master offset    1535284 s2 freq +2936262 path delay   -466758
+ptp4l[552334.195]: master offset    5968208 s2 freq +7829772 path delay   -781346
+ptp4l[552335.203]: master offset    1550052 s2 freq +5202078 path delay   -466758
+ptp4l[552336.196]: master offset   -7981215 s2 freq -3864173 path delay   -252986
+ptp4l[552337.188]: master offset   -3196236 s2 freq -1473559 path delay   -466758
+ptp4l[552338.189]: master offset    2114333 s2 freq +2878139 path delay   -498655
+ptp4l[552339.196]: master offset    9500480 s2 freq +10898586 path delay   -498655
+ptp4l[552340.201]: master offset    4724684 s2 freq +8972934 path delay   -498655
+ptp4l[552341.201]: master offset   -9042570 s2 freq -3376915 path delay   -498655
+ptp4l[552342.187]: master offset   -2917685 s2 freq  +35199 path delay  -1100424
+ptp4l[552343.184]: master offset    -553797 s2 freq +1523782 path delay   -512788
+ptp4l[552344.190]: master offset   -1457564 s2 freq +453876 path delay   -512788
+ptp4l[552345.192]: master offset    2716207 s2 freq +4190378 path delay   -967506
+ptp4l[552346.196]: master offset    1623554 s2 freq +3912587 path delay   -967506
+ptp4l[552347.197]: master offset    1244890 s2 freq +4020989 path delay   -704666
+ptp4l[552348.190]: master offset   -5549884 s2 freq -2400318 path delay   -502776
+ptp4l[552349.187]: master offset   -5767827 s2 freq -4283226 path delay   -440291
+ptp4l[552350.187]: master offset   -1552625 s2 freq -1798372 path delay   -440291
+ptp4l[552351.194]: master offset    8896646 s2 freq +8185111 path delay   -440291
+ptp4l[552352.207]: master offset   11683560 s2 freq +13641019 path delay   -642181
+ptp4l[552353.211]: master offset    -154207 s2 freq +5308320 path delay   -642181
+ptp4l[552354.198]: master offset  -14289581 s2 freq -8873316 path delay   -111652
+ptp4l[552355.182]: master offset   -3439721 s2 freq -2310330 path delay   -428301
+ptp4l[552356.192]: master offset   12409240 s2 freq +12506714 path delay  -1046205
+ptp4l[552357.202]: master offset     320193 s2 freq +4140439 path delay  -1046205
+ptp4l[552358.198]: master offset   -8535037 s2 freq -4618733 path delay  -1046205
+ptp4l[552359.191]: master offset   -2193902 s2 freq -838109 path delay  -1046205
+ptp4l[552360.192]: master offset    4000590 s2 freq +4698212 path delay  -2012408
+ptp4l[552361.201]: master offset    8171670 s2 freq +10069469 path delay  -2488011
+ptp4l[552362.204]: master offset    1895327 s2 freq +6244627 path delay  -2488011
+ptp4l[552363.198]: master offset   -9720303 s2 freq -4802404 path delay  -1773815
+ptp4l[552364.186]: master offset   -6375498 s2 freq -4373690 path delay  -1773815
+ptp4l[552365.187]: master offset    3099049 s2 freq +3188207 path delay  -2488011
+ptp4l[552366.195]: master offset    2996199 s2 freq +4015072 path delay  -2488011
+ptp4l[552367.200]: master offset    1895505 s2 freq +3813238 path delay  -1279155
+ptp4l[552368.201]: master offset   -2783884 s2 freq -297500 path delay   -795085
+ptp4l[552369.195]: master offset   -7789177 s2 freq -6137958 path delay   -560355
+ptp4l[552370.190]: master offset   -5977011 s2 freq -6662545 path delay   -560355
+ptp4l[552371.191]: master offset    4641520 s2 freq +2162883 path delay   -795085
+ptp4l[552372.195]: master offset    9947678 s2 freq +8861497 path delay   -560355
+ptp4l[552373.205]: master offset     967484 s2 freq +2865606 path delay   -560355
+ptp4l[552374.202]: master offset   -8400048 s2 freq -6211681 path delay    679987
+ptp4l[552375.196]: master offset    -441080 s2 freq -772727 path delay    679987
+ptp4l[552376.198]: master offset    5983158 s2 freq +5519187 path delay    679987
+ptp4l[552377.205]: master offset    2954130 s2 freq +4285106 path delay    679987
+ptp4l[552378.205]: master offset   -2807283 s2 freq -590068 path delay   1369821
+ptp4l[552379.199]: master offset   -5748604 s2 freq -4373574 path delay   1369821
+ptp4l[552380.196]: master offset   -5218042 s2 freq -5567593 path delay   1369821
+ptp4l[552381.195]: master offset    5386817 s2 freq +3471853 path delay   1369821
+ptp4l[552382.205]: master offset    5007610 s2 freq +4708692 path delay   1369821
+ptp4l[552383.208]: master offset    4121956 s2 freq +5325321 path delay    466087
+ptp4l[552384.206]: master offset   -4316417 s2 freq -1876466 path delay    466087
+ptp4l[552385.199]: master offset    -832365 s2 freq +312661 path delay   -352944
+ptp4l[552386.197]: master offset    -330763 s2 freq +564554 path delay   -346248
+ptp4l[552387.200]: master offset    1278453 s2 freq +2074541 path delay   -437546
+ptp4l[552388.201]: master offset    1426076 s2 freq +2605700 path delay   -530599
+ptp4l[552389.202]: master offset     788114 s2 freq +2395561 path delay   -530599
+ptp4l[552390.202]: master offset   -1173779 s2 freq +670102 path delay   -530599
+ptp4l[552391.200]: master offset    1732374 s2 freq +3224121 path delay   -493970
+ptp4l[552392.200]: master offset     193761 s2 freq +2205220 path delay   -493970
+ptp4l[552393.201]: master offset    1865114 s2 freq +3934702 path delay   -488954
+ptp4l[552394.201]: master offset   -2102032 s2 freq +527090 path delay   -488954
+ptp4l[552395.199]: master offset   -3517745 s2 freq -1519233 path delay   -432530
+ptp4l[552396.197]: master offset    -820630 s2 freq +122559 path delay   -357095
+ptp4l[552397.200]: master offset    1244695 s2 freq +1941695 path delay   -357095
+ptp4l[552398.203]: master offset    3619972 s2 freq +4690380 path delay   -417411
+ptp4l[552399.204]: master offset     392148 s2 freq +2548548 path delay   -417411
+ptp4l[552400.203]: master offset   -3838023 s2 freq -1563979 path delay   -100760
+ptp4l[552401.200]: master offset    1209405 s2 freq +2332042 path delay   -285552
+ptp4l[552402.201]: master offset    1640831 s2 freq +3126290 path delay   -443697
+ptp4l[552403.204]: master offset    2004622 s2 freq +3982330 path delay   -631103
+ptp4l[552404.206]: master offset   -1336692 s2 freq +1242403 path delay   -631103
+ptp4l[552405.202]: master offset   -5906250 s2 freq -3728163 path delay   -443697
+ptp4l[552406.196]: master offset   -5899263 s2 freq -5493051 path delay   -443697
+ptp4l[552407.196]: master offset    1682469 s2 freq +318902 path delay   -443697
+ptp4l[552408.205]: master offset   13863808 s2 freq +13004982 path delay   -780720
+ptp4l[552409.214]: master offset    3131736 s2 freq +6432052 path delay   -780720
+ptp4l[552410.207]: master offset  -13182296 s2 freq -8942459 path delay   -780720
+ptp4l[552411.194]: master offset   -3276035 s2 freq -2990887 path delay  -1148194
+ptp4l[552412.196]: master offset    9889547 s2 freq +9191885 path delay  -2243571
+ptp4l[552413.206]: master offset    1738337 s2 freq +4007539 path delay  -2243571
+ptp4l[552414.206]: master offset   -4068351 s2 freq -1277648 path delay  -2243571
+ptp4l[552415.198]: master offset  -10250023 s2 freq -8679825 path delay  -2243571
+ptp4l[552416.190]: master offset   -7717070 s2 freq -9221879 path delay  -1322586
+ptp4l[552417.191]: master offset    9890709 s2 freq +6070779 path delay  -1322586
+ptp4l[552418.208]: master offset    5549290 s2 freq +4696572 path delay  -1322586
+ptp4l[552419.215]: master offset    2645655 s2 freq +3457724 path delay  -1322586
+ptp4l[552420.209]: master offset   -7566376 s2 freq -5960610 path delay    -70320
+ptp4l[552421.201]: master offset    -658562 s2 freq -1322709 path delay    -70320
+ptp4l[552422.204]: master offset    5739947 s2 freq +4878232 path delay    -70320
+ptp4l[552423.210]: master offset    3191024 s2 freq +4051293 path delay    303575
+ptp4l[552424.211]: master offset    -952914 s2 freq +864662 path delay    190825
+ptp4l[552425.205]: master offset   -6477558 s2 freq -4945856 path delay    320203
+ptp4l[552426.201]: master offset    -305986 s2 freq -717552 path delay    320203
+ptp4l[552427.205]: master offset   11641340 s2 freq +11137978 path delay  -2006755
+ptp4l[552428.212]: master offset     437468 s2 freq +3426508 path delay  -1202318
+ptp4l[552429.207]: master offset   -7749325 s2 freq -4629044 path delay    320203
+ptp4l[552430.199]: master offset   -4217434 s2 freq -3421951 path delay    320203
+ptp4l[552431.201]: master offset    5161249 s2 freq +4691502 path delay  -1106228
+ptp4l[552432.211]: master offset   13604720 s2 freq +14683348 path delay  -3035472
+ptp4l[552433.219]: master offset    5825760 s2 freq +10985804 path delay  -3035472
+ptp4l[552434.212]: master offset  -13661790 s2 freq -6754018 path delay  -3035472
+ptp4l[552435.194]: master offset   -7290158 s2 freq -4480923 path delay  -3035472
+ptp4l[552436.192]: master offset      89270 s2 freq +711457 path delay  -2313797
+ptp4l[552437.201]: master offset    1969773 s2 freq +2618741 path delay  -1785205
+ptp4l[552438.208]: master offset    1309965 s2 freq +2549865 path delay  -1785205
+ptp4l[552439.209]: master offset   -1654692 s2 freq  -21802 path delay   -686942
+ptp4l[552440.207]: master offset   -3306313 s2 freq -2169831 path delay    187468
+ptp4l[552441.204]: master offset   -3730864 s2 freq -3586276 path delay    187468
+ptp4l[552442.205]: master offset    3052386 s2 freq +2077715 path delay   -686942
+ptp4l[552443.211]: master offset    7467135 s2 freq +7408180 path delay   -686942
+ptp4l[552444.217]: master offset    5451581 s2 freq +7632766 path delay    187468
+ptp4l[552445.214]: master offset   -6653698 s2 freq -2837038 path delay    187468
+ptp4l[552446.206]: master offset   -2615921 s2 freq -795371 path delay   -492880
+ptp4l[552447.204]: master offset     677310 s2 freq +1713084 path delay  -1051378
+ptp4l[552448.210]: master offset    4029239 s2 freq +5268206 path delay  -1051378
+ptp4l[552449.212]: master offset     930982 s2 freq +3378721 path delay  -1051378
+ptp4l[552450.210]: master offset   -1941283 s2 freq +785750 path delay  -1051378
+ptp4l[552451.205]: master offset   -1836447 s2 freq +308201 path delay   -486341
+ptp4l[552452.205]: master offset   -1455179 s2 freq +138535 path delay   -486341
+ptp4l[552453.208]: master offset    2495491 s2 freq +3652652 path delay   -486341
+ptp4l[552454.213]: master offset    7037393 s2 freq +8943201 path delay  -1042873
+ptp4l[552455.217]: master offset    -255394 s2 freq +3761632 path delay  -1042873
+ptp4l[552456.210]: master offset  -11372183 s2 freq -7431775 path delay    304034
+ptp4l[552457.203]: master offset   -1868019 s2 freq -1339266 path delay    304034
+ptp4l[552458.207]: master offset    9698764 s2 freq +9667111 path delay    304034
+ptp4l[552459.217]: master offset     810237 s2 freq +3688213 path delay    110470
+ptp4l[552460.216]: master offset   -4682482 s2 freq -1561435 path delay    110470
+ptp4l[552461.206]: master offset   -3885281 s2 freq -2168978 path delay   -225292
+ptp4l[552462.206]: master offset     220859 s2 freq +771577 path delay   -225292
+ptp4l[552463.211]: master offset    9277029 s2 freq +9894005 path delay   -748176
+ptp4l[552464.217]: master offset   -1650334 s2 freq +1749751 path delay   -225292
+ptp4l[552465.212]: master offset   -9182842 s2 freq -6277857 path delay   -225292
+ptp4l[552466.203]: master offset   -1394211 s2 freq -1244079 path delay   -630186
+ptp4l[552467.208]: master offset    9790270 s2 freq +9522139 path delay  -1439221
+ptp4l[552468.216]: master offset     548007 s2 freq +3216957 path delay   -630186
+ptp4l[552469.215]: master offset   -6772027 s2 freq -3938675 path delay   -225292
+ptp4l[552470.208]: master offset     104972 s2 freq +906716 path delay  -1330307
+ptp4l[552471.210]: master offset    4315530 s2 freq +5148765 path delay  -1880173
+ptp4l[552472.214]: master offset     958158 s2 freq +3086052 path delay  -1330307
+ptp4l[552473.210]: master offset   -2625431 s2 freq -210089 path delay   -125571
+ptp4l[552474.209]: master offset   -2958169 s2 freq -1330457 path delay    312673
+ptp4l[552475.210]: master offset    1137314 s2 freq +1877576 path delay   -530700
+ptp4l[552476.214]: master offset    4252649 s2 freq +5334105 path delay   -530700
+ptp4l[552477.217]: master offset    3489963 s2 freq +5847214 path delay  -1178760
+ptp4l[552478.217]: master offset   -3793924 s2 freq -389684 path delay  -1178760
+ptp4l[552479.208]: master offset   -9943637 s2 freq -7677575 path delay    312673
+ptp4l[552480.201]: master offset   -7943184 s2 freq -8660213 path delay    312673
+ptp4l[552481.204]: master offset   10538634 s2 freq +7438650 path delay   -530700
+ptp4l[552482.218]: master offset    4702773 s2 freq +4764379 path delay   -530700
+ptp4l[552483.222]: master offset    2250078 s2 freq +3722516 path delay   -996379
+ptp4l[552484.217]: master offset   -7702213 s2 freq -5554751 path delay   -996379
+ptp4l[552485.208]: master offset     718904 s2 freq +555702 path delay  -1178760
+ptp4l[552486.211]: master offset    5369725 s2 freq +5422194 path delay  -1178760
+ptp4l[552487.217]: master offset    2568218 s2 freq +4231604 path delay  -1112413
+ptp4l[552488.218]: master offset    -371927 s2 freq +2061925 path delay   -427877
+ptp4l[552489.213]: master offset   -8598906 s2 freq -6276632 path delay    935258
+ptp4l[552490.208]: master offset    2510640 s2 freq +2253242 path delay   -427877
+ptp4l[552491.214]: master offset    7809043 s2 freq +8304837 path delay   -427877
+ptp4l[552492.224]: master offset    8489405 s2 freq +11327912 path delay   -427877
+ptp4l[552493.226]: master offset   -4373755 s2 freq +1011573 path delay    848304
+ptp4l[552494.217]: master offset   -4112462 s2 freq  -39260 path delay    -66793
+ptp4l[552495.209]: master offset   -9134019 s2 freq -6294556 path delay    848304
+ptp4l[552496.206]: master offset   -3761190 s2 freq -3661933 path delay    848304
+ptp4l[552497.212]: master offset   13105090 s2 freq +12075990 path delay  -1714082
+ptp4l[552498.223]: master offset    2162702 s2 freq +5065129 path delay  -1714082
+ptp4l[552499.219]: master offset   -6108160 s2 freq -2556922 path delay  -1714082
+ptp4l[552500.209]: master offset   -4893798 s2 freq -3175008 path delay  -1714082
+ptp4l[552501.208]: master offset    -809292 s2 freq -558641 path delay   -680158
+ptp4l[552502.215]: master offset    8121504 s2 freq +8129367 path delay  -1422308
+ptp4l[552503.223]: master offset    2600706 s2 freq +5045020 path delay  -1422308
+ptp4l[552504.220]: master offset   -6232200 s2 freq -3007674 path delay  -1422308
+ptp4l[552505.212]: master offset   -2576191 s2 freq -1221325 path delay  -1422308
+ptp4l[552506.211]: master offset     586048 s2 freq +1168057 path delay  -1422308
+ptp4l[552507.216]: master offset    5465234 s2 freq +6223057 path delay  -1422308
+ptp4l[552508.222]: master offset    1577996 s2 freq +3975389 path delay  -1422308
+ptp4l[552509.219]: master offset   -5551990 s2 freq -2681198 path delay  -1422308
+ptp4l[552510.210]: master offset  -10640082 s2 freq -9434887 path delay  -1422308
+ptp4l[552511.204]: master offset   -4479389 s2 freq -6466218 path delay  -1714370
+ptp4l[552512.210]: master offset   11699035 s2 freq +8368389 path delay  -2297977
+ptp4l[552513.225]: master offset    5724545 s2 freq +5903609 path delay  -1481832
+ptp4l[552514.231]: master offset   -1248748 s2 freq +647680 path delay  -1481832
+ptp4l[552515.220]: master offset   -1231153 s2 freq +290650 path delay  -1481832
+ptp4l[552516.216]: master offset   -5392640 s2 freq -4240182 path delay   -389736
+ptp4l[552517.212]: master offset   -2919148 s2 freq -3384482 path delay    226020
+ptp4l[552518.216]: master offset    6709429 s2 freq +5368350 path delay   -611331
+ptp4l[552519.227]: master offset   12900904 s2 freq +13572654 path delay  -1481832
+ptp4l[552520.233]: master offset    6211780 s2 freq +10753801 path delay   -611331
+ptp4l[552521.224]: master offset  -14225323 s2 freq -7819768 path delay   -611331
+ptp4l[552522.207]: master offset  -15517190 s2 freq -13379232 path delay    771301
+ptp4l[552523.198]: master offset   -2323178 s2 freq -4840377 path delay    771301
+ptp4l[552524.212]: master offset    6349144 s2 freq +3134992 path delay    771301
+ptp4l[552525.228]: master offset    6582995 s2 freq +5273586 path delay    771301
+ptp4l[552526.232]: master offset    3954482 s2 freq +4619971 path delay    490369
+ptp4l[552527.228]: master offset   -6268400 s2 freq -4416566 path delay    490369
+ptp4l[552528.216]: master offset    2120227 s2 freq +2091541 path delay   -819763
+ptp4l[552529.217]: master offset    -864379 s2 freq -256997 path delay     19952
+ptp4l[552530.220]: master offset    2747773 s2 freq +3095841 path delay     19952
+ptp4l[552531.222]: master offset    2556732 s2 freq +3729132 path delay   -655549
+ptp4l[552532.224]: master offset    2693645 s2 freq +4633065 path delay   -655549
+ptp4l[552533.219]: master offset   -3809569 s2 freq -1062056 path delay   -655549
+ptp4l[552534.217]: master offset   -7224860 s2 freq -5620217 path delay   -434423
+ptp4l[552535.210]: master offset   -3176171 s2 freq -3738986 path delay   -434423
+ptp4l[552536.217]: master offset    7451983 s2 freq +5936316 path delay   -434423
+ptp4l[552537.225]: master offset    4230774 s2 freq +4950702 path delay   -106971
+ptp4l[552538.229]: master offset   -1704047 s2 freq +285114 path delay   -106971
+ptp4l[552539.221]: master offset   -9470009 s2 freq -7992063 path delay    106710
+ptp4l[552540.213]: master offset   -6932300 s2 freq -8295356 path delay    -10048
+ptp4l[552541.212]: master offset    4357172 s2 freq +914426 path delay    -10048
+ptp4l[552542.223]: master offset    6927821 s2 freq +4792226 path delay    -10048
+ptp4l[552543.230]: master offset    8876455 s2 freq +8819207 path delay    -10048
+ptp4l[552544.235]: master offset     371759 s2 freq +2977447 path delay    106710
+ptp4l[552545.226]: master offset   -2045512 s2 freq +671704 path delay    106710
+ptp4l[552546.221]: master offset   -8448142 s2 freq -6344580 path delay    106710
+ptp4l[552547.213]: master offset   -6599906 s2 freq -7030786 path delay    106710
+ptp4l[552548.215]: master offset    8585714 s2 freq +6174862 path delay   -497327
+ptp4l[552549.226]: master offset    3977529 s2 freq +4142391 path delay   -497327
+ptp4l[552550.230]: master offset    2627670 s2 freq +3985791 path delay   -617777
+ptp4l[552551.227]: master offset   -4474601 s2 freq -2328179 path delay   -617777
+ptp4l[552556.264]: port 1 (eth0): SLAVE to LISTENING on ANNOUNCE_RECEIPT_TIMEOUT_EXPIRES
+ptp4l[552556.264]: selected local clock 000000.fffe.049f06 as best master
+ptp4l[552556.265]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552556.267]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552556.268]: TEE: DECIDE OK -> decided_state=4 (ps_out=4)
+
+ptp4l[552562.456]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552562.458]: TEE: InvokeCommand returned 0x0
+
+ptp4l[552562.458]: TEE: DECIDE OK -> decided_state=4 (ps_out=4)
+

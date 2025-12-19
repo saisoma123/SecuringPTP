@@ -1,0 +1,64 @@
+           CPU0       CPU1       CPU2       CPU3       
+ 24:   11517699   13104124   13353378   11725469 GIC-0  29 Edge      twd
+ 25:        337        282        127        237       GPC  55 Level     i.MX Timer Tick
+ 32:          0          0          0          0  gpio-mxc   4 Edge      Volume Up
+ 33:          0          0          0          0  gpio-mxc   5 Edge      Volume Down
+ 37:          0          0          0          0  gpio-mxc   9 Edge      Mic detection
+ 46:          0          0          0          0  gpio-mxc  18 Level     mma8451
+ 55:          1          0          0          0  gpio-mxc  27 Edge      MAX8903 USB IN
+ 62:          0          0          0          0  gpio-mxc   0 Edge      2198000.mmc cd
+ 64:          0          0          0          0  gpio-mxc   2 Edge      2194000.mmc cd
+ 86:          0          0          0          0  gpio-mxc  24 Edge      MAX8903 DC IN
+119:          0          0          0          0  gpio-mxc  23 Edge      MAX8903 Status
+122:          0          0          0          0  gpio-mxc  26 Level     max11801_ts
+125:          0          0          0          0  gpio-mxc  29 Edge      Power Button
+166:          0          0          0          0  gpio-mxc   2 Edge      MAX8903 Fault
+240:          0          0          0          0  gpio-mxc   8 Edge      Headphone detection
+264:       2441          0          0          0       GPC  36 Level     21a0000.i2c
+265:     797274          0          0          0       GPC  37 Level     21a4000.i2c
+266:         21          0          0          0       GPC  38 Level     21a8000.i2c
+267:          0          0          0          0       GPC   6 Level     2400000.ipu
+268:          0          0          0          0       GPC   5 Level     2400000.ipu
+269:        496          0          0          0       GPC   8 Level     2800000.ipu
+270:          0          0          0          0       GPC   7 Level     2800000.ipu
+271:          0          0          0          0       GPC  18 Level     vdoa
+272:          0          0          0          0       GPC 107 Level     mmdc_1
+273:          0          0          0          0       GPC 112 Level     mmdc_1
+274:          0          0          0          0       GPC 113 Level     mmdc_1
+275:          0          0          0          0       GPC 114 Level     mmdc_1
+276:          0          0          0          0       GPC 102 Level     mipi_dsi
+277:          0          0          0          0       GPC 124 Level     20e4000.dcic
+278:          0          0          0          0       GPC 125 Level     20e8000.dcic
+279:          0          0          0          0       GPC 115 Level     20e0000.hdmi_video, 20e0000.hdmi_video
+280:          0          0          0          0       GPC   2 Level     20ec000.dma-controller
+281:     239681          0          0          0       GPC  26 Level     2020000.serial
+282:          0          0          0          0       GPC  39 Level     ahci-imx[2200000.sata]
+283:          0          0          0          0       GPC  31 Level     2008000.spi
+284:          0          0          0          0       GPC  19 Level     rtc alarm
+285:          0          0          0          0       GPC  81 Level     20c0000.watchdog
+286:          0          0          0          0       GPC  23 Level     mmc1
+287:          0          0          0          0       GPC  24 Level     mmc2
+288:      65273          0          0          0       GPC  25 Level     mmc3
+291:          0          0          0          0       GPC  94 Level     arm-pmu
+292:          0          0          0          0       GPC  50 Level     2034000.asrc
+293:          0          0          0          0       GPC  47 Level     202c000.ssi
+294:     145630          0          0          0       GPC 118 Level     2188000.ethernet
+295:      18985          0          0          0       GPC 119 Level     2188000.ethernet
+296:          2          0          0          0       GPC  43 Level     2184000.usb
+297:          0          0          0          0       GPC  40 Level     2184200.usb
+298:          0          0          0          0       GPC  49 Level     imx_thermal
+299:          1          0          0          0       GPC   9 Level     galcore:0
+300:        919          0          0          0       GPC  10 Level     galcore:2d
+301:          1          0          0          0       GPC  11 Level     galcore:vg
+302:          0          0          0          0       GPC  12 Level     VPU_CODEC_IRQ
+303:          0          0          0          0       GPC   3 Edge      VPU_JPG_IRQ
+304:          0          0          0          0       GPC  20 Level     caam-snvs
+305:        424          0          0          0       GPC 106 Level     2102000.jr
+IPI0:          0          0          0          0  CPU wakeup interrupts
+IPI1:        142        203        102        143  Timer broadcast interrupts
+IPI2:       3473       5483       5965       4618  Rescheduling interrupts
+IPI3:     280684     502103     510141     635429  Function call interrupts
+IPI4:          0          0          0          0  CPU stop interrupts
+IPI5:     178507     436785     445182     207388  IRQ work interrupts
+IPI6:          0          0          0          0  completion interrupts
+Err:          0
