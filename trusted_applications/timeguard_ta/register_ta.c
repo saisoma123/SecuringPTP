@@ -5,12 +5,15 @@
 #define TG_MAX_CORES   4
 #define TRACE_WINDOW   32  
 
+// Keeps track of core usage
 static int32_t g_mru_core = -1;
 
 static uint64_t g_rand_state = 0x123456789ABCDEF0ULL;
 
+// Frequency counter for frequency policy
 static uint32_t g_freq_count[TG_MAX_CORES] = {0};
 
+// SchedTrace window logic
 static int8_t schedtrace_window[TRACE_WINDOW];
 static int    schedtrace_pos    = 0;
 static int    schedtrace_filled = 0;
@@ -20,10 +23,12 @@ typedef struct {
 	bool registered;
 } sess_ctx_t;
 
+// Trust flag for PTP client
 static volatile uint32_t g_trust_ok = 1; 
 
-static const int64_t ERROR_THRESHOLD_NS = 462692; 
+static const int64_t ERROR_THRESHOLD_NS = 483302; // Average error for watchdog during baseline
 
+// Core clamping mechanism
 static int32_t tg_clamp_core(int32_t c)
 {
     if (c < 0) return 0;
@@ -31,6 +36,7 @@ static int32_t tg_clamp_core(int32_t c)
     return c;
 }
 
+// Decides random state
 static uint32_t tg_rand32(void)
 {
     uint32_t x = (uint32_t)g_rand_state;
@@ -41,7 +47,7 @@ static uint32_t tg_rand32(void)
     return x;
 }
 
-
+// Generates a random number
 static uint64_t rand_u64(void) {
 	uint64_t x = 0;
 	TEE_GenerateRandom(&x, sizeof(x));
@@ -62,7 +68,7 @@ TEE_Result TA_OpenSessionEntryPoint(uint32_t ptypes, TEE_Param params[4], void *
 void TA_CloseSessionEntryPoint(void *sess_ctx) {
 	if (sess_ctx) TEE_Free(sess_ctx);
 }
-
+// This models the registration process from the TimeGuard paper
 static TEE_Result cmd_register(sess_ctx_t *s, uint32_t ptypes, TEE_Param params[4]) {
 	if (TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT, TEE_PARAM_TYPE_MEMREF_OUTPUT,
 	                    TEE_PARAM_TYPE_NONE, TEE_PARAM_TYPE_NONE) != ptypes)
@@ -84,6 +90,7 @@ static TEE_Result cmd_register(sess_ctx_t *s, uint32_t ptypes, TEE_Param params[
 	return TEE_SUCCESS;
 }
 
+// Returns the trusted flag to the PTP client
 static TEE_Result cmd_get_trust(uint32_t ptypes, TEE_Param params[4]) {
 	if (TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_OUTPUT, TEE_PARAM_TYPE_NONE,
 	                    TEE_PARAM_TYPE_NONE, TEE_PARAM_TYPE_NONE) != ptypes)
@@ -95,6 +102,7 @@ static TEE_Result cmd_get_trust(uint32_t ptypes, TEE_Param params[4]) {
 	return TEE_SUCCESS;
 }
 
+// Returns the secure time
 static TEE_Result cmd_get_secure_time(uint32_t ptypes, TEE_Param params[4])
 {
 	if (TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_OUTPUT,
@@ -118,6 +126,7 @@ static TEE_Result cmd_get_secure_time(uint32_t ptypes, TEE_Param params[4])
 	return TEE_SUCCESS;
 }
 
+// Computes the error between the phc time and secure time
 static TEE_Result cmd_watchdog_error(uint32_t ptypes, TEE_Param params[4])
 {
 	uint32_t exp_ptypes =
@@ -168,6 +177,7 @@ static TEE_Result cmd_watchdog_error(uint32_t ptypes, TEE_Param params[4])
 	return TEE_SUCCESS;
 }
 
+// Used for setting the PHC time to the secure time
 static TEE_Result cmd_set_baseline_time(uint32_t ptypes,
                                         TEE_Param params[4])
 {
@@ -193,6 +203,7 @@ static TEE_Result cmd_set_baseline_time(uint32_t ptypes,
     return TEE_SUCCESS;
 }
 
+// Computes the simulated passive mode timestamp error based on average latency from paper
 static TEE_Result tg_compute_base_diff(int64_t phc_ns,
                                        int32_t actual_core,
                                        int32_t predicted_core,
@@ -220,7 +231,7 @@ static TEE_Result tg_compute_base_diff(int64_t phc_ns,
     return TEE_SUCCESS;
 }
 
-
+// Implemenation of SchedTrace from TimeGuard paper
 static int32_t schedtrace_predict(void)
 {
     if (schedtrace_filled == 0)
@@ -247,6 +258,7 @@ static int32_t schedtrace_predict(void)
 }
 
 
+// Implements the Most Recently Used policy from paper
 static TEE_Result cmd_passive_mru(uint32_t ptypes, TEE_Param params[4])
 {
     const uint32_t exp =
@@ -288,6 +300,7 @@ static TEE_Result cmd_passive_mru(uint32_t ptypes, TEE_Param params[4])
     return TEE_SUCCESS;
 }
 
+// Randomly selects a core based on paper
 static TEE_Result cmd_passive_random(uint32_t ptypes, TEE_Param params[4])
 {
     const uint32_t exp =
@@ -322,6 +335,7 @@ static TEE_Result cmd_passive_random(uint32_t ptypes, TEE_Param params[4])
     return TEE_SUCCESS;
 }
 
+// Predicts most frequently used core
 static TEE_Result cmd_passive_freq(uint32_t ptypes, TEE_Param params[4])
 {
     const uint32_t exp =
@@ -368,6 +382,7 @@ static TEE_Result cmd_passive_freq(uint32_t ptypes, TEE_Param params[4])
     return TEE_SUCCESS;
 }
 
+// Implements SchedTrace logic from paper
 static TEE_Result cmd_passive_schedtrace(uint32_t ptypes, TEE_Param params[4])
 {
     const uint32_t exp =
